@@ -4,7 +4,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import Provider from "./provider";
 
-const outfit = Outfit({subsets:['latin']})
+const outfit = Outfit({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -17,16 +17,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
     <html lang="en">
-      <body
-        className={outfit.className}
-      >
-        <Provider>
-        {children}
-        </Provider>
+      <body className={outfit.className}>
+        <ClerkProvider>
+          <Provider>
+            {children}
+          </Provider>
+        </ClerkProvider>
       </body>
     </html>
-    </ClerkProvider>
   );
 }
