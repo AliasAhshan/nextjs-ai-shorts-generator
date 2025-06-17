@@ -7,7 +7,7 @@ function EmptyState() {
         <div className="p-5 py-24 flex items-center flex-col mt-10 border-2 border-dashed">
             <h2>You don&apos;t have any shorts created</h2>
             <Link href={'/dashboard/create-new'}>
-            <Button>Create New Shorts Video</Button>
+            <Button className="cursor-pointer hover:scale-105">Create New Shorts Video</Button>
             </Link>
         </div>
     )
