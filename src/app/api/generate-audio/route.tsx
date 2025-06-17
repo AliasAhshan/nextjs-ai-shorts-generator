@@ -2,6 +2,9 @@ import textToSpeech from "@google-cloud/text-to-speech";
 import { NextResponse } from "next/server";
 import fs from 'fs';
 import { promisify } from 'util';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "@/configs/firebase"; 
+
 
 
 
@@ -11,6 +14,7 @@ const client = new textToSpeech.TextToSpeechClient({
 
 export async function POST(req) {
     const {text, id} = await req.json();
+    const storageRef = ref(storage, "ai-short-video-files/"+id+".mp3")
 
     const request = {
         input: {text: text},
@@ -21,10 +25,12 @@ export async function POST(req) {
     };
 
     const [response] = await client.synthesizeSpeech(request);
-        // Write the binary audio content to a local file
-        const writeFile = promisify(fs.writeFile);
-        await writeFile('output.mp3', response.audioContent, 'binary');
-        console.log('Audio content written to file: output.mp3');
+    const audioBuffer = Buffer.from(response.audioContent, "binary");
 
-    return NextResponse.json({Result: "Success"});
+    await uploadBytes(storageRef, audioBuffer, {contentType:"audio/mp3"});
+
+    const downloadUrl = await getDownloadURL(storageRef);
+
+        console.log(downloadUrl);
+    return NextResponse.json({Result: downloadUrl});
 }

@@ -15,6 +15,7 @@ function CreateNew() {
   const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
   const [scriptResult, setScriptResult] = useState<any[]>([]);
+  const [audioFileUrl, setAudioFileUrl] = useState();
 
   const onHandleInputChange = (fieldName: string, fieldValue: string) => {
     console.log("Received:", fieldName, fieldValue);
@@ -64,6 +65,7 @@ function CreateNew() {
         id:id
     }).then(res=>{
         console.log(res.data)
+        setAudioFileUrl(res.data.result);
     })
     setLoading(false)
   }
