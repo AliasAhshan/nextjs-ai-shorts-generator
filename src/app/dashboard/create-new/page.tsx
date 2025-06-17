@@ -64,7 +64,6 @@ function CreateNew() {
         text:videoScriptData,
         id:id
     }).then(res=>{
-        console.log(res.data)
         setAudioFileUrl(res.data.result);
     })
     setLoading(false)
