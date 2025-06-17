@@ -40,7 +40,7 @@ function SelectStyle({onUserSelect}: SelectStyleProps) {
         <h2 className="font-bold text-2xl text-primary">Style</h2>
         <p className="text-gray-500">Choose the style you want your video to be generated like!</p>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-5 mt-3">
-            {styleOptions.map((item, index) =>
+            {styleOptions.map((item) =>
                 <div
                 className={`relative hover:scale-105 transition-all cursor-pointer rounded-xl border-2 ${
                     selectedOption === item.name ? "border-primary" : "border-transparent"

@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Textarea } from '@/components/ui/textarea'
 
 type SelectDurationProps = {
     onUserSelect: (key: string, value: string) => void;
