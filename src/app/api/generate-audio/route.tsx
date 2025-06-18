@@ -32,5 +32,5 @@ export async function POST(req) {
     const downloadUrl = await getDownloadURL(storageRef);
 
         console.log(downloadUrl);
-    return NextResponse.json({Result: downloadUrl});
+    return NextResponse.json({result: downloadUrl});
 }

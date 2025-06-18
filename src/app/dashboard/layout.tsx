@@ -1,6 +1,8 @@
-import React, {ReactNode} from 'react';
+"use client"
+import React, {ReactNode, useState} from 'react';
 import Header from './_components/header';
 import SideNav from './_components/sidenav';
+import { VideoDataContext } from '../_context/videodatacontext';
 
 
 type Props =  {
@@ -8,7 +10,15 @@ type Props =  {
 };
 
 function DashboardLayout({children}: Props) {
+    const [videoData, setVideoData] = useState({
+    videoScript: [],
+    audioFileUrl: "",
+    captions: [],
+    imageList: []
+    });
+
     return (
+        <VideoDataContext.Provider value={{videoData, setVideoData}}>
         <div>
             <div className="hidden md:block h-screen bg-white fixed mt-[65px] w-64">
                 <SideNav/>
@@ -20,6 +30,7 @@ function DashboardLayout({children}: Props) {
                 </div>
             </div>
         </div>
+        </VideoDataContext.Provider>
     )
 }
 
