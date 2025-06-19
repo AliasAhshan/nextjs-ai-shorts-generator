@@ -15,7 +15,7 @@ type SelectTopicProps = {
 }
 
 function SelectTopic({onUserSelect}: SelectTopicProps) {
-    const options=["Custom Prompt", "Random AI Story", "Scary Story"]
+    const options=["Custom Prompt", "Historical Story", "Scary Story"]
     const [selectedOption, setSelectedOption] = useState<string | undefined>()
 
 

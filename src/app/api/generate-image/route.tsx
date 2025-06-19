@@ -34,7 +34,7 @@ export async function POST(req) {
         const downloadUrl = await getDownloadURL(storageRef);
         console.log(downloadUrl);
 
-        return NextResponse.json({"result": output[0]})
+        return NextResponse.json({ result: downloadUrl });
         //=> output_0.png written to disk
     } catch (e) {
         

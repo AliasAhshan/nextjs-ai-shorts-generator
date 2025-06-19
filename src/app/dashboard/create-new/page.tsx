@@ -9,6 +9,9 @@ import axios from "axios";
 import CustomLoading from "./_components/customloading";
 import { v4 as uuidv4 } from 'uuid';
 import { VideoDataContext } from "@/app/_context/videodatacontext";
+import { VideoData } from "@/configs/schema";
+import { useUser } from "@clerk/nextjs";
+import { db } from "@/configs/dbconfig";
 
 
 function CreateNew() {
@@ -20,7 +23,9 @@ function CreateNew() {
   const [captions, setCaptions] = useState();
   const [imageList, setImageList] = useState();
   const {videoData, setVideoData}=useContext(VideoDataContext);
-
+  const [hasSaved, setHasSaved] = useState(false);
+  const {user} = useUser();
+  
   const onHandleInputChange = (fieldName: string, fieldValue: string) => {
     console.log("Received:", fieldName, fieldValue);
     setFormData((prev) => ({
@@ -30,7 +35,11 @@ function CreateNew() {
   };
 
   const onCreateClickHandler = () => {
-    GetVideoScript()
+    setHasSaved(false); //  Reset save flag for new generation
+    setVideoData({});   //  Clear old video data
+    // setScriptResult([]); // reset display
+    setLoading(true);    //  Start loading
+    GetVideoScript().finally(() => setLoading(false)); //  Start generation flow
     // GenerateAudioFile(scriptData);
     // GenerateAudioCaption(FILEURL)
     // GenerateImage()
@@ -40,8 +49,8 @@ function CreateNew() {
   //Get video script
   const GetVideoScript = async () => {
     try {
-      setLoading(true);
-      const prompt = `Write a script to generate ${formData.duration} video on topic: ${formData.topic} along with AI image prompt in ${formData.imageStyle} format for each scene and give me result in JSON format with imagePrompt and ContentText as field, no plain text`;
+      // setLoading(true);
+      const prompt = `Write a script to generate ${formData.duration} video on topic: ${formData.topic} along with AI image prompt in ${formData.imageStyle} format for each scene and give me result in JSON format with imagePrompt and contentText as field, no plain text`;
         console.log(prompt)
         const res = await axios.post("/api/get-video-script", { prompt });
         console.log("Full response data:", res.data);
@@ -62,13 +71,13 @@ function CreateNew() {
     } catch (e) {
       console.error(e);
     } finally {
-      setLoading(false);
+      // setLoading(false);
     }
   };
 
   //Generate audio file and save to firebase
   const GenerateAudioFile = async(videoScriptData) => {
-    setLoading(true)
+    // setLoading(true)
     let script = "";
     const id=uuidv4();
     videoScriptData.forEach(item=>{
@@ -88,12 +97,12 @@ function CreateNew() {
         setAudioFileUrl(res.data.result);
         res.data.result && await GenerateAudioCaption(res.data.result, videoScriptData)
 
-        setLoading(false);
+        // setLoading(false);
   }
 
   //Generate caption
   const GenerateAudioCaption = async (fileUrl: string, videoScriptData) => {
-    setLoading(true)
+    // setLoading(true)
 
     const res = await axios.post("/api/generate-caption", {
       audioFileUrl: fileUrl
@@ -103,8 +112,9 @@ function CreateNew() {
       "captions":res.data.result
     }))
       setCaptions(res?.data?.result);
-      setLoading(false);
       res.data.result && await GenerateImage(videoScriptData);
+
+      // setLoading(false);
     }
 
     // console.log(GetVideoScript, captions, audioFileUrl)
@@ -131,13 +141,36 @@ function CreateNew() {
       "imageList": images
     }))
     setImageList(images)
-    setLoading(false);
+    // setLoading(false);
   };
 
-  useEffect(()=> {
-    console.log(videoData);
-  }, [videoData])
+  useEffect(() => {
+    const allDataReady =
+      Array.isArray(videoData?.videoScript) && videoData.videoScript.length > 0 &&
+      typeof videoData?.audioFileUrl === "string" &&
+      Array.isArray(videoData?.captions) && videoData.captions.length > 0 &&
+      Array.isArray(videoData?.imageList) && videoData.imageList.length > 0;
 
+    if (allDataReady && !hasSaved) {
+      setHasSaved(true);
+      SaveVideoData(videoData);
+    }
+  }, [videoData, hasSaved]);
+
+ 
+  const SaveVideoData = async (videoData) => {
+    if (!user) return; // don't save if user not ready
+    // setLoading(true);
+    const res = await db.insert(VideoData).values({
+      script: videoData?.videoScript,
+      audioFileUrl: videoData?.audioFileUrl,
+      captions: videoData?.captions,
+      imageList: videoData?.imageList,
+      createdBy: user?.primaryEmailAddress?.emailAddress ?? ""
+    }).returning({ id: VideoData.id });
+    console.log("Saved to DB:", res);
+    setLoading(false);
+  }
 
   return (
     <div className="md:px-20">
