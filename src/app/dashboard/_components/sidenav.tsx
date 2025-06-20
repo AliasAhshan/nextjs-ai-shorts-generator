@@ -19,20 +19,7 @@ function SideNav() {
             path:'/dashboard/create-new',
             icon:FileVideo
         },
-        {
-            id:3,
-            name:'Upgrade',
-            path:'/dashboard/upgrade',
-            icon:ShieldPlus
-        },
 
-        {
-            id:4,
-            name:'Account',
-            path:'/dashboard/account',
-            icon:CircleUser
-        },
-        
     ]
 
     const path = usePathname();
