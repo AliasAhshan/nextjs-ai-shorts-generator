@@ -26,8 +26,8 @@ function CreateNew() {
   const {videoData, setVideoData}=useContext(VideoDataContext);
   const [hasSaved, setHasSaved] = useState(false);
   const {user} = useUser();
-  const [playVideo, setPlayVideo] = useState(true);
-  const [videoId, setVideoid] = useState<number | undefined>(73);
+  const [playVideo, setPlayVideo] = useState(false);
+  const [videoId, setVideoid] = useState<number | undefined>();
 
 
 

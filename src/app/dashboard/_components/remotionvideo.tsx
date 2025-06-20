@@ -28,10 +28,7 @@ function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationIn
   return (
     <AbsoluteFill className="bg-black">
       {imageList.map((item, index) =>
-
       
-
-
       {
         const startTime = (index * getDurationFrames()) / imageList.length
         const duration = getDurationFrames();
@@ -46,11 +43,14 @@ function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationIn
           <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
             <Img
               src={item}
+              loading="eager"
+              decoding="async"
               style={{
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
-                transform:`scale(${scale(index)})`
+                transform:`scale(${scale(index)})`,
+                willChange: "transform"
               }}
             />
             <AbsoluteFill

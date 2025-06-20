@@ -17,6 +17,7 @@ import { db } from "@/configs/dbconfig";
 import { VideoData } from "@/configs/schema";
 import { eq } from "drizzle-orm";
 import { InferSelectModel } from "drizzle-orm";
+import { useRouter } from "next/navigation";
 
 type VideoDataType = InferSelectModel<typeof VideoData>;
 
@@ -25,11 +26,14 @@ export default function PlayerDialog({playVideo, videoId}) {
     const [openDialog, setOpenDialog] = useState(false);
     const [videoData, setVideoData] = useState<VideoDataType | undefined>();
     const [durationInFrames, setDurationInFrames] = useState(100);
+    const router = useRouter();
 
     useEffect(() => {
-        setOpenDialog(playVideo)
-        videoId&&GetVideoData();
-    }, [playVideo])
+    if (playVideo) {
+        setOpenDialog(true);
+        videoId && GetVideoData();
+    }
+    }, [playVideo, videoId]);
 
 
     const GetVideoData = async () => {
@@ -40,7 +44,12 @@ export default function PlayerDialog({playVideo, videoId}) {
     }
 
   return (
-    <Dialog open={openDialog}>
+    <Dialog open={openDialog} onOpenChange={(open) => {
+    if (!open) {
+        setOpenDialog(false);
+        router.replace('/dashboard'); // mimic Cancel button behavior
+    }
+    }}>
     <DialogContent className="bg-white flex flex-col items-center">
         <DialogHeader>
         <DialogTitle className="text-3xl font-bold my-5">Your video is ready!</DialogTitle>
@@ -61,7 +70,7 @@ export default function PlayerDialog({playVideo, videoId}) {
             
         />
         <div className="flex gap-10 mt-10">
-            <Button variant="ghost">Cancel</Button>
+            <Button variant="ghost" onClick={() => {router.replace('/dashboard'); setOpenDialog(false)}}>Cancel</Button>
             <Button>Export</Button>
         </div>
         </DialogDescription>
