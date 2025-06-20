@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import SelectTopic from "./_components/selecttopic";
 import SelectStyle from "./_components/selectstyle";
 import SelectDuration from "./_components/selectduration";
@@ -28,6 +28,7 @@ function CreateNew() {
   const {user} = useUser();
   const [playVideo, setPlayVideo] = useState(false);
   const [videoId, setVideoid] = useState<number | undefined>();
+  const hasSavedRef = useRef(false);
 
 
 
@@ -152,17 +153,37 @@ function CreateNew() {
   };
 
   useEffect(() => {
-    const allDataReady =
-      Array.isArray(videoData?.videoScript) && videoData.videoScript.length > 0 &&
-      typeof videoData?.audioFileUrl === "string" &&
-      Array.isArray(videoData?.captions) && videoData.captions.length > 0 &&
-      Array.isArray(videoData?.imageList) && videoData.imageList.length > 0;
+    return () => {
+      setVideoData({});
+      setScriptResult([]);
+      setCaptions(undefined);
+      setAudioFileUrl(undefined);
+      setImageList(undefined);
+      setVideoid(undefined);
+      setPlayVideo(false);
+      hasSavedRef.current = false;
+      sessionStorage.removeItem("hasSaved");
+    };
+  }, []);
 
-    if (allDataReady && !hasSaved) {
-      setHasSaved(true);
-      SaveVideoData(videoData);
-    }
-  }, [videoData, hasSaved]);
+
+
+
+  useEffect(() => {
+  const alreadySaved = sessionStorage.getItem("hasSaved") === "true";
+  const allDataReady =
+    Array.isArray(videoData?.videoScript) && videoData.videoScript.length > 0 &&
+    typeof videoData?.audioFileUrl === "string" &&
+    Array.isArray(videoData?.captions) && videoData.captions.length > 0 &&
+    Array.isArray(videoData?.imageList) && videoData.imageList.length > 0;
+
+  if (allDataReady && !hasSavedRef.current && !alreadySaved) {
+    hasSavedRef.current = true;
+    sessionStorage.setItem("hasSaved", "true");
+    SaveVideoData(videoData);
+  }
+  }, [videoData]);
+
 
  
   const SaveVideoData = async (videoData) => {
@@ -184,7 +205,7 @@ function CreateNew() {
   }
 
   return (
-    <div className="md:px-20">
+    <div className="pt-[50px] px-5 md:px-20">
       <h2 className="font-bold text-4xl text-primary text-center">Create New</h2>
       <div className="mt-10 shadow-md p-10">
         <SelectTopic onUserSelect={onHandleInputChange} />
