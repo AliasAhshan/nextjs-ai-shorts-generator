@@ -1,5 +1,5 @@
 import React from 'react'
-import { AbsoluteFill, Img, Sequence, useVideoConfig, Audio, useCurrentFrame } from 'remotion'
+import { AbsoluteFill, Img, Sequence, useVideoConfig, Audio, useCurrentFrame, interpolate } from 'remotion'
 
 function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationInFrames}) {
   const { fps } = useVideoConfig();
@@ -27,8 +27,22 @@ function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationIn
 
   return (
     <AbsoluteFill className="bg-black">
-      {imageList.map((item, index) => (
-        <Sequence key={index} from={(index * getDurationFrames()) / imageList.length} durationInFrames={getDurationFrames()}>
+      {imageList.map((item, index) =>
+
+      
+
+
+      {
+        const startTime = (index * getDurationFrames()) / imageList.length
+        const duration = getDurationFrames();
+        const scale = (index) => interpolate(
+          frame,
+          [startTime, startTime+duration/2, startTime+duration], // zoom in/out
+          index%2==0 ?[1, 1.8, 1]:[1.8, 1, 1.8],
+          { extrapolateLeft: "clamp", extrapolateRight: "clamp"}
+        )
+        return (
+        <Sequence key={index} from={startTime} durationInFrames={getDurationFrames()}>
           <AbsoluteFill style={{ justifyContent: "center", alignItems: "center" }}>
             <Img
               src={item}
@@ -36,6 +50,7 @@ function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationIn
                 width: "100%",
                 height: "100%",
                 objectFit: "cover",
+                transform:`scale(${scale(index)})`
               }}
             />
             <AbsoluteFill
@@ -53,7 +68,7 @@ function RemotionVideo({script, imageList, audioFileUrl, captions, setDurationIn
             </AbsoluteFill>
           </AbsoluteFill>
         </Sequence>
-      ))}
+      )})}
       <Audio src={audioFileUrl} />
     </AbsoluteFill>
   );
