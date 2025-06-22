@@ -50,5 +50,3 @@ This project was inspired by and built upon the work of several tools, platforms
 - [Firebase](https://firebase.google.com/) — For easy storage and hosting of media assets.
 - [Drizzle ORM](https://orm.drizzle.team/) — For its lightweight and type-safe database querying in TypeScript.
 - [Neon](https://neon.tech/) — For hosting the PostgreSQL database with serverless scalability.
-
-Huge thanks to the open-source community for building the foundations that made this project possible.
